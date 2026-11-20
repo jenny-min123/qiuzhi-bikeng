@@ -45,16 +45,30 @@ from app.tools.snapshot_store import (  # noqa: E402
     validate_record,
 )
 
+# 与企查查「工商信息」页蓝框字段一一对应
 FIELDS: tuple[tuple[str, str, bool], ...] = (
-    ("company", "公司全称", True),
+    ("company", "企业名称", True),
     ("credit_code", "统一社会信用代码", False),
-    ("founded_at", "成立日期（YYYY-MM-DD）", True),
+    ("legal_representative", "法定代表人", False),
     ("registration_status", "登记状态", True),
-    ("registered_address", "注册地址", True),
+    ("founded_at", "成立日期（YYYY-MM-DD）", True),
+    ("registered_capital", "注册资本", False),
+    ("paid_in_capital", "实缴资本", False),
+    ("organization_code", "组织机构代码", False),
+    ("business_registration_no", "工商注册号", False),
+    ("taxpayer_id", "纳税人识别号", False),
+    ("company_type", "企业类型", False),
+    ("business_term", "营业期限", False),
+    ("taxpayer_qualification", "纳税人资质", False),
     ("insured_count", "参保人数", True),
-    ("employee_count", "员工人数", False),
+    ("approval_date", "核准日期（YYYY-MM-DD）", False),
+    ("region", "所属地区", False),
+    ("registration_authority", "登记机关", False),
+    ("industry", "国标行业", False),
+    ("english_name", "英文名", False),
+    ("registered_address", "注册地址", True),
+    ("mailing_address", "通信地址", False),
     ("business_scope", "经营范围", True),
-    ("official_domain", "官网域名", False),
 )
 
 
@@ -113,9 +127,11 @@ def ask_int(label: str, current: int | None, required: bool) -> int | None:
         return value
 
 
-def ask_date(label: str, current: str | None) -> str:
+def ask_date(label: str, current: str | None, required: bool = True) -> str:
     while True:
-        answer = ask_text(label, current, required=True)
+        answer = ask_text(label, current, required)
+        if answer == "":
+            return ""
         parsed = parse_date(answer)
         if parsed:
             return parsed.isoformat()
@@ -130,23 +146,18 @@ def ask_url(label: str, current: str | None) -> str:
         print("  URL 必须以 http:// 或 https:// 开头。")
 
 
-def normalize_domain(value: str) -> str:
-    value = re.sub(r"^https?://", "", value.strip(), flags=re.I)
-    return value.split("/", 1)[0].strip().lower()
-
-
 def collect_record(candidates: dict, args: argparse.Namespace) -> dict:
     record: dict = {}
     for key, label, required in FIELDS:
         current = candidates.get(key)
-        if key in ("insured_count", "employee_count"):
+        if key == "insured_count":
             value = ask_int(label, current, required)
-        elif key in ("founded_at",):
-            value = ask_date(label, current)
+        elif key in ("founded_at", "approval_date"):
+            value = ask_date(label, current, required)
         else:
             value = ask_text(label, current, required)
         if value not in (None, ""):
-            record[key] = normalize_domain(value) if key == "official_domain" else value
+            record[key] = value
 
     record["source_url"] = ask_url("来源 URL", args.source_url)
     record["fetched_at"] = ask_date(
@@ -188,7 +199,7 @@ def process_image(image: Path, args: argparse.Namespace) -> int:
     print(result.text)
     print("--- 原文结束 ---\n")
 
-    extracted = extract_snapshot_fields(result.text)
+    extracted = extract_snapshot_fields(result.text, blocks=result.blocks)
     if extracted["missing_fields"]:
         print(f"截图中未识别到：{'、'.join(extracted['missing_fields'])}，请手工补充。")
     for warning in extracted["warnings"]:

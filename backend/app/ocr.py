@@ -29,6 +29,8 @@ class OcrResult:
     entities: list[dict] = field(default_factory=list)
     engine: str = "disabled"
     note: str = ""
+    # 每行文字及其坐标框 [x0, y0, x1, y1]，供表格类截图按位置配对字段
+    blocks: list[dict] = field(default_factory=list)
 
 
 def _dll_directories() -> list[str]:
@@ -108,11 +110,23 @@ async def recognize(image_bytes: bytes, filename: str = "") -> OcrResult:
         )
 
     lines: list[str] = []
+    blocks: list[dict] = []
     for item in result or []:
-        if isinstance(item, (list, tuple)) and len(item) >= 2:
-            text = str(item[1]).strip()
-            if text:
-                lines.append(text)
+        if not isinstance(item, (list, tuple)) or len(item) < 2:
+            continue
+        text = str(item[1]).strip()
+        if not text:
+            continue
+        lines.append(text)
+        try:
+            points = item[0]
+            xs = [float(point[0]) for point in points]
+            ys = [float(point[1]) for point in points]
+            blocks.append(
+                {"text": text, "bbox": [min(xs), min(ys), max(xs), max(ys)]}
+            )
+        except (TypeError, ValueError, IndexError):
+            continue
 
     text = "\n".join(lines)
     entities = [
@@ -124,4 +138,5 @@ async def recognize(image_bytes: bytes, filename: str = "") -> OcrResult:
         entities=entities,
         engine="rapidocr",
         note="" if text else "未识别到文字，请换一张更清晰的截图或手动粘贴。",
+        blocks=blocks,
     )

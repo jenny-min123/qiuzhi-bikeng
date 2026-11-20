@@ -51,7 +51,7 @@ qiuzhi-bikeng/
 │   │   ├── providers/    可插拔证据源
 │   │   └── data/         phrases.json（真实话术词表）/ company_alias.json
 │   ├── data/             标注数据 + 人工核验快照（见下）
-│   └── scripts/          add_snapshot.py / validate_snapshots.py / train_model.py / evaluate_rules.py / label_tool.py
+│   └── scripts/          import_snapshot.py / add_snapshot.py / validate_snapshots.py / train_model.py / evaluate_rules.py / label_tool.py
 ├── frontend/             Vue3 + Vite + Element Plus + Pinia
 └── docs/api.md
 ```
@@ -122,6 +122,9 @@ python scripts/label_tool.py check
 
 ```powershell
 cd backend
+# 从企查查工商信息截图录入：本地 OCR + 逐项人工核对
+python scripts/import_snapshot.py "C:\路径\工商截图.png"
+# 或手动参数录入
 python scripts/add_snapshot.py --help
 python scripts/validate_snapshots.py
 ```

@@ -24,7 +24,7 @@ REQUIRED_FIELDS = (
     "source_url",
     "fetched_at",
 )
-DATE_FIELDS = ("founded_at", "fetched_at")
+DATE_FIELDS = ("founded_at", "approval_date", "fetched_at")
 DATE_FORMATS = ("%Y-%m-%d", "%Y/%m/%d", "%Y年%m月%d日", "%Y年%m月")
 
 

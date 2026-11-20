@@ -18,7 +18,33 @@
 
 ## 二、怎么填
 
-推荐用录入脚本，避免手改 JSON 出错：
+### 从工商截图直接录入
+
+```powershell
+cd backend
+python scripts/import_snapshot.py "C:\路径\工商信息截图.png"
+```
+
+脚本在本机 OCR（图片不出本机），按企查查「工商信息」页的表格位置把
+「标签 → 右侧值」配对，然后逐项询问：
+
+- 直接回车：接受 OCR 候选值
+- 输入新内容：替换
+- 输入 `-`：清空可选字段
+
+最后打印完整 JSON，确认后写入快照。常用选项：
+
+```powershell
+python scripts/import_snapshot.py shot.png --dry-run        # 只预览不写
+python scripts/import_snapshot.py a.png b.png               # 多张截图依次录入
+python scripts/import_snapshot.py shot.png --source-url https://www.gsxt.gov.cn/
+```
+
+核准日期被 VIP 遮挡时脚本会提示，可手工填写或直接跳过。
+
+### 手动参数录入
+
+也可以用命令行参数逐项填写：
 
 ```powershell
 cd backend
@@ -52,7 +78,7 @@ python scripts/add_snapshot.py --company "..." ... --dry-run
 
 | 字段 | 必填 | 说明 |
 |---|---|---|
-| `companies` 的键 | 是 | 公司工商全称 |
+| `companies` 的键 | 是 | 企业名称（工商全称） |
 | `founded_at` | 是 | 成立日期，`YYYY-MM-DD` |
 | `registered_address` | 是 | 注册地址 |
 | `insured_count` | 是 | 参保人数，整数 |
@@ -61,8 +87,23 @@ python scripts/add_snapshot.py --company "..." ... --dry-run
 | `source_url` | 是 | 查询页面 URL；缺失则整条按未核验处理 |
 | `fetched_at` | 是 | 人工查询日期，`YYYY-MM-DD`；缺失则整条按未核验处理 |
 | `credit_code` | 否 | 统一社会信用代码 |
-| `employee_count` | 否 | 员工人数，整数 |
-| `official_domain` | 否 | 官网域名，用于联系一致性校验 |
+| `legal_representative` | 否 | 法定代表人 |
+| `registered_capital` | 否 | 注册资本 |
+| `paid_in_capital` | 否 | 实缴资本 |
+| `organization_code` | 否 | 组织机构代码 |
+| `business_registration_no` | 否 | 工商注册号 |
+| `taxpayer_id` | 否 | 纳税人识别号 |
+| `company_type` | 否 | 企业类型 |
+| `business_term` | 否 | 营业期限 |
+| `taxpayer_qualification` | 否 | 纳税人资质 |
+| `approval_date` | 否 | 核准日期，`YYYY-MM-DD` |
+| `region` | 否 | 所属地区 |
+| `registration_authority` | 否 | 登记机关 |
+| `industry` | 否 | 国标行业 |
+| `english_name` | 否 | 英文名 |
+| `mailing_address` | 否 | 通信地址 |
+| `employee_count` | 否 | 员工人数，整数（企查查工商页没有此项） |
+| `official_domain` | 否 | 官网域名，用于联系一致性校验（企查查工商页没有此项） |
 | `note` | 否 | 查询人 / 备注 |
 
 示例（占位符，不是真实数据）：
