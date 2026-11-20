@@ -10,6 +10,7 @@
 - 工程方案：[`大专生求职避坑平台_全栈开发方案.md`](./大专生求职避坑平台_全栈开发方案.md)
 - 接口契约：[`docs/api.md`](./docs/api.md)
 - 实验记录：[`docs/experiments.md`](./docs/experiments.md)（含真实指标与局限说明）
+- 标注规范：[`docs/annotation_spec.md`](./docs/annotation_spec.md)（F-05）
 
 ## 当前阶段
 
@@ -25,6 +26,7 @@
 | 8 工具 / Orchestrator 5 步 | ✅ | 固定编排，非开放 ReAct |
 | Provider 插件层 | ✅ 框架 | 高德 POI / WHOIS 已写实现；未配置 key 或通道时跳过 |
 | 一致性校验 9 类 | ✅ 框架 | 两侧数据齐全才判定，否则列入「未核对」 |
+| F-05 标注规范 | ✅ | `docs/annotation_spec.md`，含边界裁决、span 规则与复核流程 |
 | 决策报告 / 证据链 | ✅ | 模板渲染，木桶原则 + 一票否决 |
 | OCR | ✅ 本地引擎 | RapidOCR + onnxruntime，图片不出本机；失败时明确返回 503 |
 | PDF / 长图导出 | ✅ | `/export` 模板渲染 PDF / PNG，复用报告 JSON，不重算分数 |
