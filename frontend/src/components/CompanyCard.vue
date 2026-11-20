@@ -27,15 +27,25 @@ const level = computed(() => levelText[props.score.level] || props.score.level)
     <template v-if="score.available">
       <div class="score-row">
         <div class="score-value">
-          {{ score.score }}<small>/ 100</small>
+          <template v-if="score.score !== null && score.score !== undefined">
+            {{ score.score }}<small>/ 100</small>
+          </template>
+          <template v-else>—</template>
         </div>
         <div class="score-meta">
           <span>{{ level }}</span>
           <span>置信度：{{ score.confidence }}</span>
+          <span v-if="score.coverage != null">
+            证据覆盖：{{ Math.round(score.coverage * 100) }}%
+          </span>
         </div>
       </div>
 
-      <p v-if="!score.deductions.length" class="empty">
+      <p v-if="score.score === null || score.score === undefined" class="empty">
+        可用证据覆盖不足，暂不给出可信度分数。以下仅列出已获取到的风险项。
+      </p>
+
+      <p v-else-if="!score.deductions.length" class="empty">
         当前证据未发现低于基线的事项。
       </p>
 

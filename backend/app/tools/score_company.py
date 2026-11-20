@@ -6,6 +6,8 @@
     score     = 100 - sum(s.penalty for s in available) * (100 / total_w)
 
 没有拿到任何证据时返回 score=None、available=False，不给「看起来完整」的假分数。
+可用证据覆盖不足 40% 时返回 score=None、level=unknown，避免单一弱信号
+直接得出「低风险」结论；缺失来源仍会完整列出。
 """
 
 from __future__ import annotations
@@ -39,6 +41,7 @@ def score_company(evidence: list[EvidenceResult]) -> dict:
             "level": "unknown",
             "confidence": "低",
             "available": False,
+            "coverage": 0.0,
             "missing_sources": missing,
             "deductions": [],
         }
@@ -67,11 +70,24 @@ def score_company(evidence: list[EvidenceResult]) -> dict:
             }
         )
 
+    # 覆盖不足 40% 时不给出可信度等级：单一弱信号不足以支撑「低风险」结论
+    if coverage < 0.4:
+        return {
+            "score": None,
+            "level": "unknown",
+            "confidence": "低",
+            "available": True,
+            "coverage": round(coverage, 2),
+            "missing_sources": missing,
+            "deductions": deductions,
+        }
+
     return {
         "score": score,
         "level": _level(score),
         "confidence": _confidence(coverage),
         "available": True,
+        "coverage": round(coverage, 2),
         "missing_sources": missing,
         "deductions": deductions,
     }

@@ -16,8 +16,23 @@ export const getReport = (reportId) =>
 export const runBatch = (payload) =>
   http.post('/batch', payload).then((res) => res.data)
 
-export const exportReport = (reportId, format = 'pdf') =>
-  http.post('/export', { report_id: reportId, format }).then((res) => res.data)
+export const downloadReport = async (reportId, format = 'pdf') => {
+  const response = await http.post(
+    '/export',
+    { report_id: reportId, format },
+    { responseType: 'blob', timeout: 120000 }
+  )
+  const mediaType = format === 'pdf' ? 'application/pdf' : 'image/png'
+  const blob = new Blob([response.data], { type: mediaType })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${reportId}.${format === 'pdf' ? 'pdf' : 'png'}`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
 
 export const ocrImage = (file) => {
   const form = new FormData()

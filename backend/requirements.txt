@@ -11,6 +11,9 @@ beautifulsoup4==4.15.0
 python-whois>=0.9
 python-dotenv>=1.0
 
-# 选做（F-06 截图 OCR / F-04 PDF 导出，当前框架未启用）
+# F-04 报告导出
+reportlab>=4.2
+pillow>=10
+
+# 选做（F-09 截图 OCR，当前框架未启用）
 # pytesseract
-# reportlab

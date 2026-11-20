@@ -61,6 +61,7 @@
     "level": "unknown",
     "confidence": "低",
     "available": false,
+    "coverage": 0.0,
     "missing_sources": ["地图POI", "ICP备案", "域名年龄", "平台企业认证", "社交口碑", "工商信息"],
     "deductions": []
   },
@@ -89,7 +90,9 @@
 | `jd_risk.score` | 规则引擎扣分求和（上限 100），当前基线实现 |
 | `jd_risk.hits[].span` | **字符级**起止下标，前端据此高亮 |
 | `jd_risk.classify_prob` | TF-IDF+LR 模型概率；模型未训练时为 `null` |
-| `company_score.score` | 动态权重归一化后的可信分；无证据时为 `null` |
+| `company_score.score` | 动态权重归一化后的可信分；无证据或证据覆盖不足 40% 时为 `null` |
+| `company_score.coverage` | 可用证据权重 / 全部注册证据源权重；低于 0.4 时不给出等级 |
+| `company_score.available` | 是否至少获取到一条主体证据（可为 true 但 score 为 null） |
 | `company_score.missing_sources` | 本次未获取的证据源 |
 | `consistency.critical` | 一票否决项（如签约方 ≠ 招聘方） |
 | `verdict.final_suggestion` | `建议投递` / `谨慎投递` / `建议放弃` |
@@ -153,7 +156,17 @@ OCR 引擎未接入时返回 `503`，`detail` 说明原因；不返回空文本�
 { "report_id": "rpt_20261120_ab12cd34", "format": "pdf" }
 ```
 
-当前报告已可通过 `GET /reports/{report_id}` 取回；PDF / 长图渲染器尚未接入，导出接口返回 `501` 并说明原因（开发序位第 8 周）。
+响应为文件流：
+
+| format | Content-Type | 说明 |
+|---|---|---|
+| `pdf` | `application/pdf` | A4 模板渲染，可打印 |
+| `png` | `image/png` | 1080px 宽长图，便于分享 |
+
+响应头带 `Content-Disposition: attachment; filename="<report_id>.<ext>"`。
+导出只读取数据库中的报告 JSON，不重新计算分数。
+依赖 `reportlab`、`Pillow` 与系统中文字体（Microsoft YaHei / 黑体 / Noto CJK）；
+字体缺失时返回 `503` 并说明原因，不返回损坏文件。
 
 ## GET /reports/{report_id}
 

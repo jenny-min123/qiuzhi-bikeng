@@ -88,6 +88,7 @@ class CompanyScore(BaseModel):
     level: CompanyLevel = "unknown"
     confidence: Confidence = "低"
     available: bool = False
+    coverage: float = Field(default=0.0, ge=0, le=1, description="可用证据权重占全部注册证据源的比例")
     missing_sources: list[str] = Field(default_factory=list)
     deductions: list[CompanyDeduction] = Field(default_factory=list)
 

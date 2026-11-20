@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
 
-import { exportReport } from '../api'
+import { downloadReport } from '../api'
 
 const props = defineProps({
   report: { type: Object, required: true }
@@ -23,19 +23,32 @@ const levelText = {
 }
 
 function companyScoreText() {
-  return props.report.company_score.available
-    ? String(props.report.company_score.score)
-    : '—'
+  const company = props.report.company_score
+  if (!company.available) return '—'
+  return company.score === null || company.score === undefined
+    ? '证据不足'
+    : String(company.score)
+}
+
+async function errorDetail(error) {
+  const data = error?.response?.data
+  if (data instanceof Blob) {
+    try {
+      const parsed = JSON.parse(await data.text())
+      return parsed.detail
+    } catch {
+      return null
+    }
+  }
+  return data?.detail || error?.message
 }
 
 async function onExport(format) {
   try {
-    await exportReport(props.report.report_id, format)
-    ElMessage.success('导出完成')
+    await downloadReport(props.report.report_id, format)
+    ElMessage.success('报告已开始下载')
   } catch (error) {
-    ElMessage.warning(
-      error?.response?.data?.detail || '导出功能尚未接入，可先截图分享报告。'
-    )
+    ElMessage.warning((await errorDetail(error)) || '导出失败，请稍后重试。')
   }
 }
 </script>

@@ -28,8 +28,12 @@ PROVIDERS: tuple[EvidenceProvider, ...] = (
 )
 
 
+# Provider 行为变更时递增，避免旧缓存污染结果
+CACHE_VERSION = "2"
+
+
 async def _fetch_cached(provider: EvidenceProvider, company: str) -> EvidenceResult:
-    key = f"evidence:{provider.name}:{company.strip().lower()}"
+    key = f"evidence:{CACHE_VERSION}:{provider.name}:{company.strip().lower()}"
     cached = db.cache_get(key)
     if cached is not None:
         try:
