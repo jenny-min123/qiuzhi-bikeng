@@ -13,14 +13,16 @@ from ..config import settings
 
 _loaded = False
 _pipeline = None
+_load_error: str | None = None
 
 
 def _load() -> None:
-    global _loaded, _pipeline
+    global _loaded, _pipeline, _load_error
     if _loaded:
         return
     _loaded = True
     if not (settings.model_path.exists() and settings.vectorizer_path.exists()):
+        _load_error = "未找到训练模型（运行 scripts/train_model.py 生成 app/data/model.pkl）"
         return
     try:
         import joblib
@@ -28,8 +30,9 @@ def _load() -> None:
         vectorizer = joblib.load(settings.vectorizer_path)
         model = joblib.load(settings.model_path)
         _pipeline = (vectorizer, model)
-    except Exception:
+    except Exception as exc:
         _pipeline = None
+        _load_error = f"模型加载失败：{exc}"
 
 
 @lru_cache(maxsize=2048)
@@ -47,7 +50,7 @@ def classify_jd(text: str) -> dict:
         return {
             "prob": None,
             "available": False,
-            "note": "未找到训练模型（运行 scripts/train_model.py 生成 app/data/model.pkl）",
+            "note": _load_error or "模型不可用",
         }
     try:
         return {"prob": round(_predict(text), 4), "available": True, "note": None}

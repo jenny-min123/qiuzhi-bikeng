@@ -18,11 +18,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATASET = BASE_DIR / "data" / "dataset_full.csv"
 OUT_DIR = BASE_DIR / "app" / "data"
 
+sys.path.insert(0, str(BASE_DIR))
 
-def cut(text: str) -> list[str]:
-    import jieba
-
-    return jieba.lcut(text)
+# 必须从模块导入，不能在本文件里定义：向量化器会 pickle 这个函数
+from app.tools.tokenizer import cut  # noqa: E402
 
 
 def main() -> int:
@@ -81,6 +80,10 @@ def main() -> int:
     joblib.dump(model, OUT_DIR / "model.pkl")
     print(f"已保存：{OUT_DIR / 'vectorizer.pkl'}")
     print(f"已保存：{OUT_DIR / 'model.pkl'}")
+    print(
+        "\n注意：当前数据集模板高度相似，随机划分的测试集接近重复样本，"
+        "以上指标仅作基线，不代表泛化性能（见 V3 第八章）。"
+    )
     return 0
 
 

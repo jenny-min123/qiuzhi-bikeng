@@ -9,6 +9,7 @@
 - 设计依据：[`大专生求职避坑平台_项目终极设计文档_V3.md`](./大专生求职避坑平台_项目终极设计文档_V3.md)
 - 工程方案：[`大专生求职避坑平台_全栈开发方案.md`](./大专生求职避坑平台_全栈开发方案.md)
 - 接口契约：[`docs/api.md`](./docs/api.md)
+- 实验记录：[`docs/experiments.md`](./docs/experiments.md)（含真实指标与局限说明）
 
 ## 当前阶段
 
@@ -20,7 +21,7 @@
 | FastAPI 应用 / CORS / SQLite | ✅ | `/analyze`、`/analyze/stream`(SSE)、`/batch`、`/reports/{id}`、`/health` |
 | `scan_phrases` 规则引擎 | ✅ | 词表 v0.2：官方话术 + 数据补齐 11 个变体；含培训边界规则与「零门槛 + 8K」组合信号 |
 | `extract_jd` | ✅ 降级 | 未配置 LLM 时用正则抽取，响应中标注 `extracted_by` |
-| `classify_jd` | ✅ 接口 | 模型未训练时返回 `available=false`，不编造概率 |
+| `classify_jd` | ✅ | TF-IDF + LogisticRegression 已训练并接入；模型缺失时返回 `available=false`，不编造概率 |
 | 8 工具 / Orchestrator 5 步 | ✅ | 固定编排，非开放 ReAct |
 | Provider 插件层 | ✅ 框架 | 高德 POI / WHOIS 已写实现；未配置 key 或通道时跳过 |
 | 一致性校验 9 类 | ✅ 框架 | 两侧数据齐全才判定，否则列入「未核对」 |
@@ -85,12 +86,15 @@ npm run dev
 
 `backend/app/data/phrases.json` 为风险话术词表，词条与官方依据在文件 `_meta` / `official_basis` 中标注。
 
-训练分类模型（可选，未运行也不影响框架）：
+训练分类模型（已训练产物在 `backend/app/data/`，重新运行会覆盖）：
 
 ```bash
 cd backend
 python scripts/train_model.py
 ```
+
+> 注意：当前数据模板高度相似，训练脚本输出的 1.000 是样本内指标，不代表泛化性能。
+> 详见 [`docs/experiments.md`](./docs/experiments.md)。
 
 检查标注 span 对齐：
 

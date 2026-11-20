@@ -5,8 +5,6 @@ __pycache__/
 venv/
 .env
 backend/cache.sqlite3
-backend/app/data/model.pkl
-backend/app/data/vectorizer.pkl
 
 # Frontend
 frontend/node_modules/
