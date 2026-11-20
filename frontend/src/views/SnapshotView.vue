@@ -162,7 +162,7 @@ function buildPayload(form) {
   return payload
 }
 
-async function saveItem(item) {
+async function saveItem(item, silent = false) {
   const lacking = requiredMissing(item.form)
   if (lacking.length) {
     ElMessage.warning(`${item.form.company || item.fileName} 请补充：${lacking.join('、')}`)
@@ -174,7 +174,7 @@ async function saveItem(item) {
   item.error = ''
   try {
     item.saved = await saveCompanySnapshot(buildPayload(item.form))
-    ElMessage.success(`已保存：${item.saved.company}`)
+    if (!silent) ElMessage.success(`已保存：${item.saved.company}`)
     return true
   } catch (err) {
     item.error = detailMessage(err)
@@ -203,7 +203,7 @@ async function saveAll() {
   savingAll.value = true
   let done = 0
   for (const item of pending) {
-    if (await saveItem(item)) done += 1
+    if (await saveItem(item, true)) done += 1
   }
   savingAll.value = false
   ElMessage.success(`批量保存完成：${done}/${pending.length} 条`)
