@@ -50,8 +50,8 @@ qiuzhi-bikeng/
 │   │   ├── tools/        8 个确定性工具 + registry.py
 │   │   ├── providers/    可插拔证据源
 │   │   └── data/         phrases.json（真实话术词表）/ company_alias.json
-│   ├── data/             标注数据（见下）
-│   └── scripts/          train_model.py / evaluate_rules.py / label_tool.py + 原始采集脚本
+│   ├── data/             标注数据 + 人工核验快照（见下）
+│   └── scripts/          add_snapshot.py / validate_snapshots.py / train_model.py / evaluate_rules.py / label_tool.py
 ├── frontend/             Vue3 + Vite + Element Plus + Pinia
 └── docs/api.md
 ```
@@ -118,10 +118,11 @@ python scripts/train_model.py
 python scripts/label_tool.py check
 ```
 
-填写并校验人工核验快照（F-02 / F-03 演示所需，填真实公开数据）：
+录入并校验人工核验快照（F-02 / F-03 演示所需，填真实公开数据）：
 
-```bash
+```powershell
 cd backend
+python scripts/add_snapshot.py --help
 python scripts/validate_snapshots.py
 ```
 

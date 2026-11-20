@@ -18,14 +18,34 @@
 
 ## 二、怎么填
 
-复制模板：
+推荐用录入脚本，避免手改 JSON 出错：
 
-```bash
-cd backend/data
-copy company_snapshots.example.json company_snapshots.json
+```powershell
+cd backend
+python scripts/add_snapshot.py `
+  --company "某某网络科技有限公司" `
+  --founded-at 2024-07-01 `
+  --address "某市某区某路 1 号" `
+  --insured-count 3 `
+  --scope "教育咨询服务；企业管理咨询" `
+  --status 存续 `
+  --source-url "https://www.gsxt.gov.cn/" `
+  --fetched-at 2026-11-20
 ```
 
-然后编辑 `company_snapshots.json`，把 `<...>` 占位内容替换为真实结果。
+脚本会校验字段、原子写入，并提示这条记录能解锁哪些一致性规则。
+
+其他命令：
+
+```powershell
+python scripts/add_snapshot.py --list
+python scripts/add_snapshot.py --remove "某某网络科技有限公司"
+python scripts/add_snapshot.py --company "..." ... --dry-run
+```
+
+如果公司名称与已有记录相近，脚本默认拒绝写入；确认是不同主体时加 `--force`。
+
+也可以手动编辑 `company_snapshots.json`，格式见下。
 **当前仓库里的 `company_snapshots.json` 是空文件，未包含任何虚构公司。**
 
 ### 字段
