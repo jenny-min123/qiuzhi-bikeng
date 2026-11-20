@@ -11,6 +11,7 @@
 - 接口契约：[`docs/api.md`](./docs/api.md)
 - 实验记录：[`docs/experiments.md`](./docs/experiments.md)（含真实指标与局限说明）
 - 标注规范：[`docs/annotation_spec.md`](./docs/annotation_spec.md)（F-05）
+- 人工核验快照：[`docs/manual_snapshot.md`](./docs/manual_snapshot.md)（F-02 / F-03 的合规数据来源）
 
 ## 当前阶段
 
@@ -24,8 +25,9 @@
 | `extract_jd` | ✅ 降级 | 未配置 LLM 时用正则抽取，响应中标注 `extracted_by` |
 | `classify_jd` | ✅ | TF-IDF + LogisticRegression 已训练并接入；模型缺失时返回 `available=false`，不编造概率 |
 | 8 工具 / Orchestrator 5 步 | ✅ | 固定编排，非开放 ReAct |
-| Provider 插件层 | ✅ 框架 | 高德 POI / WHOIS 已写实现；未配置 key 或通道时跳过 |
-| 一致性校验 9 类 | ✅ 框架 | 两侧数据齐全才判定，否则列入「未核对」 |
+| Provider 插件层 | ✅ | 高德 POI / WHOIS 已实现；工商支持「人工核验快照」，缺失来源明确跳过 |
+| F-02 公司可信度核验 | ✅ 支持快照 | 填真实工商快照后可评分；正式 API 可替换快照 |
+| F-03 一致性校验 9 类 | ✅ 5 类 | 规模/地址/时间/行业/联系可在有证据时评估，其余列入「未核对」 |
 | F-05 标注规范 | ✅ | `docs/annotation_spec.md`，含边界裁决、span 规则与复核流程 |
 | 决策报告 / 证据链 | ✅ | 模板渲染，木桶原则 + 一票否决 |
 | OCR | ✅ 本地引擎 | RapidOCR + onnxruntime，图片不出本机；失败时明确返回 503 |
@@ -114,6 +116,13 @@ python scripts/train_model.py
 
 ```bash
 python scripts/label_tool.py check
+```
+
+填写并校验人工核验快照（F-02 / F-03 演示所需，填真实公开数据）：
+
+```bash
+cd backend
+python scripts/validate_snapshots.py
 ```
 
 评估规则基线（样本内，score≥40 时 P/R/F1 均为 1.000；**此结果经过同数据集校准，

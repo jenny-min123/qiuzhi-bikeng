@@ -30,6 +30,20 @@ CONSISTENCY_RULES: tuple[tuple[str, str], ...] = (
 )
 
 _EMAIL_PATTERN = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+_INDUSTRY_GROUPS: dict[str, tuple[str, ...]] = {
+    "技术研发": ("软件", "开发", "程序", "算法", "数据", "网络", "计算机", "互联网", "人工智能", "测试", "运维", "前端", "后端"),
+    "教育培训": ("教育", "培训", "咨询", "教学", "课程", "讲师"),
+    "医疗健康": ("医疗", "医药", "护理", "医院", "药店", "生物", "健康", "医师", "药师"),
+    "建筑工程": ("建筑", "工程", "施工", "装饰", "装修", "建材", "监理"),
+    "物流运输": ("物流", "运输", "仓储", "快递", "货运", "配送"),
+    "餐饮住宿": ("餐饮", "食品", "酒店", "住宿", "厨师", "客房", "前台"),
+    "销售运营": ("销售", "贸易", "零售", "批发", "电商", "运营", "客服", "市场", "门店"),
+    "传媒设计": ("传媒", "广告", "文化", "视频", "剪辑", "设计", "摄影", "新媒体"),
+    "生产制造": ("制造", "生产", "加工", "机械", "设备", "仪表", "装配"),
+    "安保物业": ("安保", "保安", "物业", "清洁", "家政"),
+    "财务金融": ("金融", "财务", "会计", "投资", "保险", "出纳"),
+    "人力行政": ("人力资源", "招聘", "行政", "文员", "助理", "人事"),
+}
 _FREE_MAIL = {
     "qq.com",
     "163.com",
@@ -268,15 +282,50 @@ def _rule_contact(jd: JDInfo, facts: dict) -> list[dict] | None:
     return []
 
 
+def _industry_groups(text: str) -> set[str]:
+    return {
+        group
+        for group, keywords in _INDUSTRY_GROUPS.items()
+        if any(keyword in text for keyword in keywords)
+    }
+
+
+def _rule_industry(jd: JDInfo, facts: dict) -> list[dict] | None:
+    """岗位方向与经营范围是否匹配（需要工商经营范围）。"""
+    position = jd.position
+    business_scope = facts.get("business_scope")
+    if not position or not business_scope:
+        return None
+
+    position_groups = _industry_groups(position)
+    scope_groups = _industry_groups(str(business_scope))
+    if not position_groups or not scope_groups:
+        return None
+    if position_groups & scope_groups:
+        return []
+
+    return [
+        _mismatch(
+            "行业",
+            f"岗位：{position}",
+            f"经营范围：{business_scope}",
+            "medium",
+            8.0,
+            "岗位方向（" + "、".join(sorted(position_groups)) + "）未体现在经营范围（"
+            + "、".join(sorted(scope_groups)) + "）中，建议核实岗位是否真实。",
+        )
+    ]
+
+
 def _not_evaluable(jd: JDInfo, facts: dict) -> list[dict] | None:
-    """行业 / 薪资 / 业务 / 资质：需要经营范围、市场中位薪资、行业许可等数据。"""
+    """薪资 / 业务 / 资质：需要市场中位薪资、主营业务标签、行业许可等数据。"""
     return None
 
 
 _EVALUATORS: dict[str, Callable[[JDInfo, dict], list[dict] | None]] = {
     "scale": _rule_scale,
     "address": _rule_address,
-    "industry": _not_evaluable,
+    "industry": _rule_industry,
     "subject": _rule_subject,
     "time": _rule_time,
     "salary": _not_evaluable,

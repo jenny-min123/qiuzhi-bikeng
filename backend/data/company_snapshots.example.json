@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "name": "企业工商信息人工核验快照 · 填写模板（不是真实数据）",
+    "note": "把本文件复制为 company_snapshots.json 后，将占位内容替换为真实查询结果。示例中的尖括号内容均为占位符，不能直接用于分析。"
+  },
+  "companies": {
+    "<公司工商全称>": {
+      "credit_code": "<统一社会信用代码，可选>",
+      "founded_at": "YYYY-MM-DD",
+      "registered_address": "<注册地址>",
+      "insured_count": 0,
+      "employee_count": 0,
+      "business_scope": "<经营范围原文>",
+      "registration_status": "存续",
+      "official_domain": "<官网域名，可选>",
+      "source_url": "https://www.gsxt.gov.cn/",
+      "fetched_at": "YYYY-MM-DD",
+      "note": "<查询人 / 备注>"
+    }
+  }
+}

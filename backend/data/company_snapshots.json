@@ -1,0 +1,22 @@
+{
+  "_meta": {
+    "name": "企业工商信息人工核验快照",
+    "version": "0.1",
+    "note": "只填写通过国家企业信用信息公示系统、信用中国等公开渠道人工查询到的信息。source_url 与 fetched_at 必填，缺失的记录会被按未核验处理，不参与评分。",
+    "fields": {
+      "company": "工商全称（作为 companies 的键）",
+      "credit_code": "统一社会信用代码（可选）",
+      "founded_at": "成立日期 YYYY-MM-DD",
+      "registered_address": "注册地址",
+      "insured_count": "参保人数（整数）",
+      "employee_count": "员工人数（可选，整数）",
+      "business_scope": "经营范围原文",
+      "registration_status": "登记状态，如 存续 / 在业 / 注销",
+      "official_domain": "官网域名（可选，用于联系一致性校验）",
+      "source_url": "查询页面 URL（必填）",
+      "fetched_at": "人工查询日期 YYYY-MM-DD（必填）",
+      "note": "备注（可选）"
+    }
+  },
+  "companies": {}
+}

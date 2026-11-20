@@ -42,10 +42,14 @@ def _decide(jd_risk: dict, company_score: dict, consistency: dict) -> Verdict:
     if jd_level == "high" or (company_available and company_level == "high_risk"):
         return Verdict(final_suggestion="建议放弃")
 
+    # 木桶原则：一致性校验出现 high 级矛盾，视为核心模块高危
+    if "high" in severities:
+        return Verdict(final_suggestion="建议放弃")
+
     if (
         jd_level == "medium"
         or (company_available and company_level == "medium_risk")
-        or severities & {"high", "medium"}
+        or "medium" in severities
     ):
         return Verdict(final_suggestion="谨慎投递")
 
