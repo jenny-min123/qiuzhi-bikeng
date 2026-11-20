@@ -1,0 +1,16 @@
+# 大专生求职避坑平台 · 后端依赖（对齐《全栈开发方案》第九章）
+fastapi==0.163.1
+uvicorn[standard]==0.54.0
+pydantic==2.14.3
+jieba==0.42.1
+scikit-learn>=1.5
+joblib>=1.4
+openai>=1.60
+httpx==0.28.1
+beautifulsoup4==4.15.0
+python-whois>=0.9
+python-dotenv>=1.0
+
+# 选做（F-06 截图 OCR / F-04 PDF 导出，当前框架未启用）
+# pytesseract
+# reportlab
