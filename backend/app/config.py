@@ -36,6 +36,7 @@ class Settings:
     db_path: Path = BACKEND_DIR / "cache.sqlite3"
     phrases_path: Path = DATA_DIR / "phrases.json"
     alias_path: Path = DATA_DIR / "company_alias.json"
+    dataset_path: Path = BACKEND_DIR / "data" / "dataset_full.csv"
     model_path: Path = DATA_DIR / "model.pkl"
     vectorizer_path: Path = DATA_DIR / "vectorizer.pkl"
 

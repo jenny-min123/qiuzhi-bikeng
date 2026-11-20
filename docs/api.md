@@ -136,6 +136,39 @@ data: { ...完整 AnalyzeReport... }
 
 批量模式只做岗位侧规则扫描，不做主体核验。
 
+## GET /phrases
+
+风险话术词库（F-08）。返回 `app/data/phrases.json` 的分类体系，并在 168 条
+标注集上统计各类别的命中频次。
+
+响应：
+
+```json
+{
+  "meta": { "name": "招转培/培训贷风险话术词表", "version": "0.2", "source": "……" },
+  "categories": [
+    {
+      "type": "零门槛类",
+      "official_basis": "第一步引流话术……",
+      "weight": 8,
+      "words": ["零门槛", "无门槛", "……"],
+      "word_count": 17,
+      "corpus_hits": 60
+    }
+  ],
+  "total_words": 97,
+  "corpus": {
+    "size": 168,
+    "positive": 60,
+    "negative": 108,
+    "source": "backend/data/dataset_full.csv"
+  }
+}
+```
+
+`corpus_hits` 是类别在标注语料中的总命中次数（同一条 JD 可命中多次），
+不是预测准确率。
+
 ## POST /ocr
 
 `multipart/form-data`，字段 `file`。图片上限 10MB。

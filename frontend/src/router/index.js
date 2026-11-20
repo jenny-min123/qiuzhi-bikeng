@@ -17,6 +17,11 @@ const routes = [
     component: () => import('../views/BatchView.vue')
   },
   {
+    path: '/phrases',
+    name: 'phrases',
+    component: () => import('../views/PhrasesView.vue')
+  },
+  {
     path: '/report/:id?',
     name: 'report',
     component: () => import('../views/ReportView.vue')

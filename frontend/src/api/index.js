@@ -16,6 +16,8 @@ export const getReport = (reportId) =>
 export const runBatch = (payload) =>
   http.post('/batch', payload).then((res) => res.data)
 
+export const getPhrases = () => http.get('/phrases').then((res) => res.data)
+
 export const downloadReport = async (reportId, format = 'pdf') => {
   const response = await http.post(
     '/export',

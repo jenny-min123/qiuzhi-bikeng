@@ -9,6 +9,7 @@
         <RouterLink to="/">首页</RouterLink>
         <RouterLink to="/analyze">开始核验</RouterLink>
         <RouterLink to="/batch">批量模式</RouterLink>
+        <RouterLink to="/phrases">话术词库</RouterLink>
       </nav>
     </header>
 

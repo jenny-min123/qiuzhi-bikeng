@@ -46,5 +46,10 @@
         <p>汇总每条结论的证据链，便于向平台、12333 或公安提交时间线材料。</p>
       </div>
     </section>
+
+    <p class="rule-note">
+      想看每类风险话术的原文依据和应对办法？
+      <RouterLink to="/phrases">查看风险话术词库与科普卡 →</RouterLink>
+    </p>
   </div>
 </template>
