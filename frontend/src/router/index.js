@@ -22,6 +22,11 @@ const routes = [
     component: () => import('../views/PhrasesView.vue')
   },
   {
+    path: '/subject-check',
+    name: 'subject-check',
+    component: () => import('../views/SubjectCheckView.vue')
+  },
+  {
     path: '/report/:id?',
     name: 'report',
     component: () => import('../views/ReportView.vue')

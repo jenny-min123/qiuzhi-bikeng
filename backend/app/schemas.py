@@ -36,6 +36,25 @@ class ExportRequest(BaseModel):
     format: Literal["pdf", "png"] = "pdf"
 
 
+class SubjectCheckRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=20000)
+    recruiter_company: str | None = Field(default=None, max_length=200)
+
+
+class SubjectEntity(BaseModel):
+    name: str
+    matches_recruiter: bool | None = None
+
+
+class SubjectCheckResponse(BaseModel):
+    recruiter_company: str | None = None
+    entities: list[SubjectEntity] = Field(default_factory=list)
+    matched: bool | None = None
+    severity: Literal["low", "medium", "high", "critical", "unknown"] = "unknown"
+    alert: str
+    advice: list[str] = Field(default_factory=list)
+
+
 # ---------- JD 抽取 ----------
 
 

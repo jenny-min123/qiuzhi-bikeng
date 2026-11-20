@@ -51,5 +51,9 @@
       想看每类风险话术的原文依据和应对办法？
       <RouterLink to="/phrases">查看风险话术词库与科普卡 →</RouterLink>
     </p>
+    <p class="rule-note">
+      已经收到面试邀约或协议？
+      <RouterLink to="/subject-check">核对招聘方与签约方是否同一主体 →</RouterLink>
+    </p>
   </div>
 </template>

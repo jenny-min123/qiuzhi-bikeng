@@ -8,7 +8,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from . import db
-from .api import routes_analyze, routes_export, routes_ocr, routes_phrases
+from .api import (
+    routes_analyze,
+    routes_export,
+    routes_ocr,
+    routes_phrases,
+    routes_subject,
+)
 from .config import settings
 
 
@@ -37,6 +43,7 @@ app.include_router(routes_analyze.router)
 app.include_router(routes_ocr.router)
 app.include_router(routes_export.router)
 app.include_router(routes_phrases.router)
+app.include_router(routes_subject.router)
 
 
 @app.get("/health", tags=["meta"])

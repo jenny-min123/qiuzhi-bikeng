@@ -18,6 +18,9 @@ export const runBatch = (payload) =>
 
 export const getPhrases = () => http.get('/phrases').then((res) => res.data)
 
+export const checkSubject = (payload) =>
+  http.post('/subject-check', payload).then((res) => res.data)
+
 export const downloadReport = async (reportId, format = 'pdf') => {
   const response = await http.post(
     '/export',

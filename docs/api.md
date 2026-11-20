@@ -169,6 +169,45 @@ data: { ...完整 AnalyzeReport... }
 `corpus_hits` 是类别在标注语料中的总命中次数（同一条 JD 可命中多次），
 不是预测准确率。
 
+## POST /subject-check
+
+主体分离核验（F-06 文本入口）。从邀约 / 协议 / 收款页面文字中提取公司全称，
+与招聘方做同一性判断。不依赖工商数据，也不需要 OCR。
+
+请求：
+
+```json
+{
+  "text": "甲方：深圳市某某教育科技有限公司；乙方：张三",
+  "recruiter_company": "深圳市星辰网络科技有限公司"
+}
+```
+
+响应：
+
+```json
+{
+  "recruiter_company": "深圳市星辰网络科技有限公司",
+  "entities": [
+    { "name": "深圳市某某教育科技有限公司", "matches_recruiter": false }
+  ],
+  "matched": false,
+  "severity": "critical",
+  "alert": "招聘方与签约方不是同一主体，这是招转培的典型特征。",
+  "advice": ["不要签字。", "不要下载任何对方指定的 App。", "不要转账或办理分期。"]
+}
+```
+
+判定规则（V3 7.3）：
+
+| 情形 | severity |
+|---|---|
+| 文本主体与招聘方全称一致（含明确分支机构） | `low` |
+| 出现 2 个不同主体 | `medium` |
+| 出现 ≥3 个不同主体 | `high` |
+| 招聘方 ≠ 签约方 | `critical`（建议一票否决） |
+| 未填招聘方 / 未识别到公司全称 | `unknown`，提示人工核对 |
+
 ## POST /ocr
 
 `multipart/form-data`，字段 `file`。图片上限 10MB。

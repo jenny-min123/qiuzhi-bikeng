@@ -10,6 +10,7 @@ import re
 
 from .. import llm
 from ..schemas import JDInfo
+from .company_names import extract_company_names
 
 _SYSTEM_PROMPT = """你是招聘 JD 信息抽取器。只做信息抽取，不做风险判断。
 输出一个 JSON 对象，字段如下（没有把握的字段一律填 null，禁止猜测）：
@@ -23,13 +24,11 @@ _SYSTEM_PROMPT = """你是招聘 JD 信息抽取器。只做信息抽取，不�
 }
 要求：只输出 JSON，不要解释，不要 markdown 代码块。"""
 
-_PREFIXES = ("招聘", "诚聘", "急聘", "公司名称", "企业名称", "公司", "企业", "位于")
 _POSITION_PATTERN = re.compile(r"(?:岗位|职位|招聘|诚聘)[：:\s]*([^\n，,。；;|]{2,25})")
-_COMPANY_PATTERN = re.compile(
-    r"([一-龥A-Za-z0-9（）()·]{2,32}?"
-    r"(?:有限责任公司|股份有限公司|有限公司|集团公司|集团|工作室|研究院|事务所))"
-)
 _EMAIL_PATTERN = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+_COMPANY_HINTS = ("有限公司", "有限责任公司", "股份有限公司", "集团", "工作室", "研究院", "事务所")
+_SALARY_HINTS = ("月薪", "薪资", "工资", "待遇", "元/", "K", "k")
+_LABEL_PREFIX = re.compile(r"^(招聘|诚聘|急聘|岗位|职位)[：:\s]*")
 
 
 def _clean(value: object) -> str | None:
@@ -40,26 +39,35 @@ def _clean(value: object) -> str | None:
 
 
 def _extract_company(text: str) -> str | None:
-    matches = _COMPANY_PATTERN.findall(text)
-    if not matches:
-        return None
-    name = max(matches, key=len)
-    changed = True
-    while changed:
-        changed = False
-        for prefix in _PREFIXES:
-            if name.startswith(prefix) and len(name) - len(prefix) >= 6:
-                name = name[len(prefix) :]
-                changed = True
-    return name or None
+    names = extract_company_names(text)
+    return max(names, key=len) if names else None
+
+
+def _looks_like_company(value: str) -> bool:
+    return any(hint in value for hint in _COMPANY_HINTS)
+
+
+def _looks_like_salary(value: str) -> bool:
+    return any(hint in value for hint in _SALARY_HINTS)
 
 
 def _extract_position(text: str) -> str | None:
     match = _POSITION_PATTERN.search(text)
     if match:
-        return _clean(match.group(1))
+        candidate = _clean(match.group(1))
+        if candidate and not _looks_like_company(candidate):
+            return candidate
+
+    # 回退：按标点切第一行，跳过公司名、薪资等非岗位片段
     first_line = next((line.strip() for line in text.splitlines() if line.strip()), "")
-    return _clean(first_line[:25]) or None
+    for segment in re.split(r"[，,。；;|]", first_line):
+        candidate = _clean(_LABEL_PREFIX.sub("", segment.strip()))
+        if not candidate or len(candidate) > 25:
+            continue
+        if _looks_like_company(candidate) or _looks_like_salary(candidate):
+            continue
+        return candidate
+    return None
 
 
 def _extract_salary(text: str) -> str | None:

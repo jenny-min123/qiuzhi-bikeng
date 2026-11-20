@@ -6,42 +6,15 @@
 
 from __future__ import annotations
 
-import re
 from urllib.parse import quote
 
 import httpx
 
 from ..config import settings
+from ..tools.company_names import same_subject
 from .base import EvidenceProvider, EvidenceResult
 
 _RESIDENTIAL_WORDS = ("住宅", "居民", "小区", "公寓", "宿舍")
-_BRANCH_WORDS = ("分公司", "分店", "办事处", "营业部", "门店")
-_PUNCT = re.compile(r"[\s（）()·,，。\-—_]")
-
-
-def _normalize(name: str) -> str:
-    return _PUNCT.sub("", name or "")
-
-
-def _same_subject(query: str, poi_name: str) -> bool:
-    """主体名同一性判断：只接受全称一致或明确的分支机构后缀。
-
-    关键词搜索会返回名称相近但主体不同的地点（例如查「深圳市星辰网络科技
-    有限公司」返回「深圳市守望星辰网络科技有限公司」），不能直接当作证据。
-    """
-    query_n = _normalize(query)
-    poi_n = _normalize(poi_name)
-    if not query_n or not poi_n:
-        return False
-    if query_n == poi_n:
-        return True
-
-    for short, long in ((query_n, poi_n), (poi_n, query_n)):
-        if long.startswith(short):
-            extra = long[len(short) :]
-            if len(extra) <= 8 and any(word in extra for word in _BRANCH_WORDS):
-                return True
-    return False
 
 
 class AmapPOIProvider(EvidenceProvider):
@@ -95,7 +68,7 @@ class AmapPOIProvider(EvidenceProvider):
         matched = [
             poi
             for poi in pois
-            if _same_subject(company, str(poi.get("name") or ""))
+            if same_subject(company, str(poi.get("name") or ""))
         ]
         if not matched:
             return EvidenceResult(
