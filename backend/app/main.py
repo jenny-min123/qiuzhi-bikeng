@@ -13,6 +13,7 @@ from .api import (
     routes_export,
     routes_ocr,
     routes_phrases,
+    routes_snapshots,
     routes_subject,
 )
 from .config import settings
@@ -44,6 +45,7 @@ app.include_router(routes_ocr.router)
 app.include_router(routes_export.router)
 app.include_router(routes_phrases.router)
 app.include_router(routes_subject.router)
+app.include_router(routes_snapshots.router)
 
 
 @app.get("/health", tags=["meta"])

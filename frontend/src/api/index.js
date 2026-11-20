@@ -21,6 +21,20 @@ export const getPhrases = () => http.get('/phrases').then((res) => res.data)
 export const checkSubject = (payload) =>
   http.post('/subject-check', payload).then((res) => res.data)
 
+export const extractSnapshot = (file) => {
+  const form = new FormData()
+  form.append('file', file)
+  return http
+    .post('/snapshot/extract', form, { timeout: 120000 })
+    .then((res) => res.data)
+}
+
+export const saveCompanySnapshot = (payload) =>
+  http.post('/company-snapshots', payload).then((res) => res.data)
+
+export const getCompanySnapshots = () =>
+  http.get('/company-snapshots').then((res) => res.data)
+
 export const downloadReport = async (reportId, format = 'pdf') => {
   const response = await http.post(
     '/export',

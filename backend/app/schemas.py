@@ -46,6 +46,80 @@ class SubjectEntity(BaseModel):
     matches_recruiter: bool | None = None
 
 
+class SnapshotFields(BaseModel):
+    """企查查「工商信息」页字段，按页面顺序排列。"""
+
+    company: str | None = None
+    credit_code: str | None = None
+    legal_representative: str | None = None
+    registration_status: str | None = None
+    founded_at: str | None = None
+    registered_capital: str | None = None
+    paid_in_capital: str | None = None
+    organization_code: str | None = None
+    business_registration_no: str | None = None
+    taxpayer_id: str | None = None
+    company_type: str | None = None
+    business_term: str | None = None
+    taxpayer_qualification: str | None = None
+    insured_count: int | None = None
+    employee_count: int | None = None
+    approval_date: str | None = None
+    region: str | None = None
+    registration_authority: str | None = None
+    industry: str | None = None
+    english_name: str | None = None
+    registered_address: str | None = None
+    mailing_address: str | None = None
+    business_scope: str | None = None
+    official_domain: str | None = None
+
+
+class SnapshotExtractResponse(BaseModel):
+    text: str
+    fields: SnapshotFields
+    missing_fields: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    suggested_fetched_at: str
+
+
+class SnapshotUpsertRequest(BaseModel):
+    company: str = Field(min_length=4, max_length=200)
+    founded_at: str = Field(min_length=8, max_length=20)
+    registered_address: str = Field(min_length=2, max_length=300)
+    insured_count: int = Field(ge=0)
+    business_scope: str = Field(min_length=1, max_length=2000)
+    registration_status: str = Field(min_length=1, max_length=50)
+    source_url: str = Field(pattern=r"^https?://", max_length=500)
+    fetched_at: str = Field(min_length=8, max_length=20)
+    credit_code: str | None = Field(default=None, max_length=50)
+    legal_representative: str | None = Field(default=None, max_length=100)
+    registered_capital: str | None = Field(default=None, max_length=100)
+    paid_in_capital: str | None = Field(default=None, max_length=100)
+    organization_code: str | None = Field(default=None, max_length=50)
+    business_registration_no: str | None = Field(default=None, max_length=50)
+    taxpayer_id: str | None = Field(default=None, max_length=50)
+    company_type: str | None = Field(default=None, max_length=100)
+    business_term: str | None = Field(default=None, max_length=100)
+    taxpayer_qualification: str | None = Field(default=None, max_length=50)
+    approval_date: str | None = Field(default=None, max_length=20)
+    region: str | None = Field(default=None, max_length=100)
+    registration_authority: str | None = Field(default=None, max_length=100)
+    industry: str | None = Field(default=None, max_length=100)
+    english_name: str | None = Field(default=None, max_length=200)
+    mailing_address: str | None = Field(default=None, max_length=300)
+    employee_count: int | None = Field(default=None, ge=0)
+    official_domain: str | None = Field(default=None, max_length=200)
+    note: str | None = Field(default=None, max_length=500)
+
+
+class SnapshotUpsertResponse(BaseModel):
+    action: Literal["新增", "更新"]
+    company: str
+    unlocked_rules: list[str] = Field(default_factory=list)
+    snapshot_path: str
+
+
 class SubjectCheckResponse(BaseModel):
     recruiter_company: str | None = None
     entities: list[SubjectEntity] = Field(default_factory=list)

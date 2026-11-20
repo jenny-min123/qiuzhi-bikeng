@@ -27,6 +27,11 @@ const routes = [
     component: () => import('../views/SubjectCheckView.vue')
   },
   {
+    path: '/snapshot',
+    name: 'snapshot',
+    component: () => import('../views/SnapshotView.vue')
+  },
+  {
     path: '/report/:id?',
     name: 'report',
     component: () => import('../views/ReportView.vue')

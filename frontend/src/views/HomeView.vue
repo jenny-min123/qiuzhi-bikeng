@@ -55,5 +55,9 @@
       已经收到面试邀约或协议？
       <RouterLink to="/subject-check">核对招聘方与签约方是否同一主体 →</RouterLink>
     </p>
+    <p class="rule-note">
+      有企查查或公示系统的公司页面截图？
+      <RouterLink to="/snapshot">上传截图建立公司快照 →</RouterLink>
+    </p>
   </div>
 </template>

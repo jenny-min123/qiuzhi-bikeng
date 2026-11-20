@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import JdInput from '../components/JdInput.vue'
 import RiskHighlight from '../components/RiskHighlight.vue'
@@ -10,8 +10,10 @@ import ReportPanel from '../components/ReportPanel.vue'
 import { useAnalysisStore } from '../store/analysis'
 
 const store = useAnalysisStore()
+const route = useRoute()
 const router = useRouter()
 const report = computed(() => store.report)
+const initialCompany = computed(() => String(route.query.company || ''))
 
 async function handleSubmit({ jdText, companyName }) {
   await store.run(jdText, companyName)
@@ -23,7 +25,11 @@ async function handleSubmit({ jdText, companyName }) {
 
 <template>
   <div class="page">
-    <JdInput :loading="store.loading" @submit="handleSubmit" />
+    <JdInput
+      :loading="store.loading"
+      :initial-company="initialCompany"
+      @submit="handleSubmit"
+    />
 
     <div v-if="store.loading" class="progress-card">
       <div
@@ -48,6 +54,10 @@ async function handleSubmit({ jdText, companyName }) {
     <template v-if="report && !store.loading">
       <RiskHighlight :text="report.jd.text" :hits="report.jd_risk.hits" />
       <CompanyCard :score="report.company_score" />
+      <p v-if="!report.company_score.available" class="rule-note">
+        该公司暂无主体证据，可以
+        <RouterLink to="/snapshot">上传工商页面截图补充 →</RouterLink>
+      </p>
       <ConsistencyCard :consistency="report.consistency" />
       <ReportPanel :report="report" />
     </template>

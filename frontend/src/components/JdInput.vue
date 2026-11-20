@@ -5,12 +5,13 @@ import { ElMessage } from 'element-plus'
 import { ocrImage } from '../api'
 
 const props = defineProps({
-  loading: { type: Boolean, default: false }
+  loading: { type: Boolean, default: false },
+  initialCompany: { type: String, default: '' }
 })
 const emit = defineEmits(['submit'])
 
 const jdText = ref('')
-const companyName = ref('')
+const companyName = ref(props.initialCompany || '')
 const ocrLoading = ref(false)
 
 const SAMPLE_JD =

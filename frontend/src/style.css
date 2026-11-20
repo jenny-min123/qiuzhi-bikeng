@@ -600,6 +600,90 @@ a {
   flex: none;
 }
 
+/* ---------- 公司快照录入 ---------- */
+
+.snapshot-upload {
+  width: 100%;
+}
+
+.snapshot-upload .el-upload {
+  width: 100%;
+}
+
+.snapshot-upload .el-upload-dragger {
+  width: 100%;
+  padding: 34px 20px;
+  background: var(--paper);
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+}
+
+.upload-hint strong {
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.upload-hint p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.snapshot-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.form-section {
+  margin: 10px 0 -2px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-section:first-child {
+  margin-top: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field .el-input-number {
+  width: 100%;
+}
+
+.ocr-text {
+  margin: 0;
+  padding: 14px;
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--paper);
+  border-radius: 10px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
 /* ---------- 签约方核验 ---------- */
 
 .rule-hint {
@@ -814,7 +898,8 @@ a {
   .report-grid,
   .batch-summary,
   .phrase-grid,
-  .science-grid {
+  .science-grid,
+  .snapshot-form {
     grid-template-columns: 1fr;
   }
 

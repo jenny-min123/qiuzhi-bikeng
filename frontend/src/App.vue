@@ -11,6 +11,7 @@
         <RouterLink to="/batch">批量模式</RouterLink>
         <RouterLink to="/phrases">话术词库</RouterLink>
         <RouterLink to="/subject-check">签约方核验</RouterLink>
+        <RouterLink to="/snapshot">公司快照</RouterLink>
       </nav>
     </header>
 

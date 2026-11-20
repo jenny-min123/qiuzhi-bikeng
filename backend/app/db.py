@@ -73,6 +73,11 @@ def cache_set(key: str, value: dict[str, Any], ttl_seconds: int | None = None) -
         )
 
 
+def cache_delete(key: str) -> None:
+    with _connect() as conn:
+        conn.execute("DELETE FROM evidence_cache WHERE key = ?", (key,))
+
+
 def save_report(report_id: str, payload: dict[str, Any]) -> None:
     with _connect() as conn:
         conn.execute(

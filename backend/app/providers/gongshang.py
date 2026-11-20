@@ -11,57 +11,13 @@
 
 from __future__ import annotations
 
-import json
-from datetime import date, datetime
+from datetime import date
 
-from ..config import settings
-from ..tools.company_names import same_subject
+from ..tools.snapshot_store import find_snapshot, parse_date
 from .base import EvidenceProvider, EvidenceResult
 
 _OK_STATUS = {"存续", "在业", "开业", "在营", "正常"}
 _REQUIRED_PROVENANCE = ("source_url", "fetched_at")
-_DATE_FORMATS = ("%Y-%m-%d", "%Y/%m/%d", "%Y年%m月%d日", "%Y年%m月")
-
-
-def _parse_date(value: object) -> date | None:
-    if isinstance(value, date) and not isinstance(value, datetime):
-        return value
-    if isinstance(value, datetime):
-        return value.date()
-    if not isinstance(value, str):
-        return None
-    for fmt in _DATE_FORMATS:
-        try:
-            return datetime.strptime(value.strip(), fmt).date()
-        except ValueError:
-            continue
-    return None
-
-
-def _load_snapshots() -> dict[str, dict]:
-    path = settings.snapshot_path
-    if not path.exists():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    companies = data.get("companies") or {}
-    return {
-        str(name): facts
-        for name, facts in companies.items()
-        if isinstance(facts, dict)
-    }
-
-
-def _find_snapshot(company: str) -> tuple[str | None, dict | None]:
-    snapshots = _load_snapshots()
-    if company in snapshots:
-        return company, snapshots[company]
-    for name, facts in snapshots.items():
-        if same_subject(company, name):
-            return name, facts
-    return None, None
 
 
 def _score_snapshot(facts: dict) -> tuple[float, list[str]]:
@@ -85,7 +41,7 @@ def _score_snapshot(facts: dict) -> tuple[float, list[str]]:
             penalty += 6
             reasons.append(f"参保人数仅 {int(insured)} 人")
 
-    founded = _parse_date(facts.get("founded_at"))
+    founded = parse_date(facts.get("founded_at"))
     if founded:
         years = (date.today() - founded).days / 365.25
         if years < 1:
@@ -126,7 +82,7 @@ class GongshangProvider(EvidenceProvider):
     async def fetch(self, company: str) -> EvidenceResult:
         # 正式 API 接入位：配置 GONGSHANG_API_URL / KEY 后在此调用，
         # 再把响应归一化成下方 detail 字段即可，评分与校验逻辑不用改。
-        matched_name, facts = _find_snapshot(company)
+        matched_name, facts = find_snapshot(company)
         if not facts:
             return self.unavailable(
                 "未配置工商 API，且人工核验快照中没有该公司的记录"
