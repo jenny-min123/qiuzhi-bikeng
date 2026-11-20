@@ -18,7 +18,7 @@
 | 模块 | 状态 | 说明 |
 |---|---|---|
 | FastAPI 应用 / CORS / SQLite | ✅ | `/analyze`、`/analyze/stream`(SSE)、`/batch`、`/reports/{id}`、`/health` |
-| `scan_phrases` 规则引擎 | ✅ | 读取真实 `phrases.json`（依据五部门风险提示整理），字符级 span |
+| `scan_phrases` 规则引擎 | ✅ | 词表 v0.2：官方话术 + 数据补齐 11 个变体；含培训边界规则与「零门槛 + 8K」组合信号 |
 | `extract_jd` | ✅ 降级 | 未配置 LLM 时用正则抽取，响应中标注 `extracted_by` |
 | `classify_jd` | ✅ 接口 | 模型未训练时返回 `available=false`，不编造概率 |
 | 8 工具 / Orchestrator 5 步 | ✅ | 固定编排，非开放 ReAct |
@@ -44,7 +44,7 @@ qiuzhi-bikeng/
 │   │   ├── providers/    可插拔证据源
 │   │   └── data/         phrases.json（真实话术词表）/ company_alias.json
 │   ├── data/             标注数据（见下）
-│   └── scripts/          train_model.py / label_tool.py + 原始采集脚本
+│   └── scripts/          train_model.py / evaluate_rules.py / label_tool.py + 原始采集脚本
 ├── frontend/             Vue3 + Vite + Element Plus + Pinia
 └── docs/api.md
 ```
@@ -96,6 +96,13 @@ python scripts/train_model.py
 
 ```bash
 python scripts/label_tool.py check
+```
+
+评估规则基线（样本内，score≥40 时 P/R/F1 均为 1.000；**此结果经过同数据集校准，
+不能当作泛化性能**，论文需用独立校验集复测）：
+
+```bash
+python scripts/evaluate_rules.py
 ```
 
 ## 边界与免责
