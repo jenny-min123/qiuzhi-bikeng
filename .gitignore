@@ -5,6 +5,7 @@ __pycache__/
 venv/
 .env
 backend/cache.sqlite3
+backend/vendor/msvc/
 
 # Frontend
 frontend/node_modules/

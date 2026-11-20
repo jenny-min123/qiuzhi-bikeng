@@ -15,5 +15,5 @@ python-dotenv>=1.0
 reportlab>=4.2
 pillow>=10
 
-# 选做（F-09 截图 OCR，当前框架未启用）
-# pytesseract
+# F-09 本地 OCR（图片不出本机）
+rapidocr-onnxruntime>=1.2

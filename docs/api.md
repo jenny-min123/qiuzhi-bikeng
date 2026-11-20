@@ -218,7 +218,11 @@ data: { ...完整 AnalyzeReport... }
 { "text": "……", "entities": [{ "type": "signing_party", "name": "XX教育科技有限公司" }] }
 ```
 
-OCR 引擎未接入时返回 `503`，`detail` 说明原因；不返回空文本冒充识别成功。
+识别由本地 RapidOCR（onnxruntime）完成，图片不出本机。`entities` 是从识别文本中
+提取出的公司全称，供签约方核验使用。
+
+OCR 被配置为 `disabled`、引擎未安装或加载失败时返回 `503`，`detail` 说明原因；
+不返回空文本冒充识别成功。
 
 ## POST /export
 

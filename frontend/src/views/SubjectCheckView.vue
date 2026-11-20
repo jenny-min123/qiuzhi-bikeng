@@ -2,11 +2,12 @@
 import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
-import { checkSubject } from '../api'
+import { checkSubject, ocrImage } from '../api'
 
 const text = ref('')
 const recruiter = ref('')
 const loading = ref(false)
+const ocrLoading = ref(false)
 const result = ref(null)
 const error = ref('')
 
@@ -21,6 +22,31 @@ const severityMeta = {
 const meta = computed(
   () => severityMeta[result.value?.severity] || severityMeta.unknown
 )
+
+async function handleUpload(uploadFile) {
+  const file = uploadFile?.raw
+  if (!file || loading.value) return
+  ocrLoading.value = true
+  try {
+    const data = await ocrImage(file)
+    if (data.text) {
+      text.value = data.text
+      ElMessage.success(
+        data.entities?.length
+          ? `已识别 ${data.entities.length} 个公司主体`
+          : '已识别截图文本'
+      )
+    } else {
+      ElMessage.warning('未识别到文字，请换一张更清晰的截图或手动粘贴')
+    }
+  } catch (err) {
+    ElMessage.warning(
+      err?.response?.data?.detail || 'OCR 暂不可用，请手动粘贴文字'
+    )
+  } finally {
+    ocrLoading.value = false
+  }
+}
 
 async function submit() {
   if (!text.value.trim()) {
@@ -58,7 +84,7 @@ async function submit() {
     <section class="card">
       <div class="card-head">
         <h2>录入材料</h2>
-        <span class="muted">当前为文本入口，截图 OCR 已预留</span>
+        <span class="muted">可粘贴文字，也可上传截图本地 OCR</span>
       </div>
 
       <label class="input-label" for="subject-text">邀约 / 协议 / 收款页面文字</label>
@@ -81,6 +107,15 @@ async function submit() {
             clearable
           />
         </div>
+        <el-upload
+          :auto-upload="false"
+          :show-file-list="false"
+          accept="image/*"
+          :on-change="handleUpload"
+        >
+          <el-button :loading="ocrLoading">上传截图 OCR</el-button>
+        </el-upload>
+
         <el-button type="primary" :loading="loading" @click="submit">
           核对主体
         </el-button>
@@ -89,6 +124,7 @@ async function submit() {
       <p class="rule-hint">
         核心判断只依赖主体名同一性，不需要工商数据。
         全称一致或明确的分支机构会判为一致；名称相近但主体不同会告警。
+        OCR 在本机运行，图片不会上传到第三方服务。
       </p>
     </section>
 

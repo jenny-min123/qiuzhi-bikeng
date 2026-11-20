@@ -26,10 +26,10 @@
 | Provider 插件层 | ✅ 框架 | 高德 POI / WHOIS 已写实现；未配置 key 或通道时跳过 |
 | 一致性校验 9 类 | ✅ 框架 | 两侧数据齐全才判定，否则列入「未核对」 |
 | 决策报告 / 证据链 | ✅ | 模板渲染，木桶原则 + 一票否决 |
-| OCR | ⏳ 预留 | 未接入时 `/ocr` 返回 503，不返回假文本 |
+| OCR | ✅ 本地引擎 | RapidOCR + onnxruntime，图片不出本机；失败时明确返回 503 |
 | PDF / 长图导出 | ✅ | `/export` 模板渲染 PDF / PNG，复用报告 JSON，不重算分数 |
 | F-08 话术词库页 | ✅ | 7 类词表 + 标注集命中频次 + 6 张科普卡 |
-| F-06 主体分离检测 | ✅ 文本入口 | `/subject-check`：主体名归一化 + 同一性判断；截图 OCR 入口仍待接入 |
+| F-06 主体分离检测 | ✅ | `/subject-check` + 截图 OCR：主体名归一化 + 同一性判断 |
 | Vue3 前端 | ✅ 骨架 | 首页 / 核验页 / 报告页 / 批量页 / 话术词库页 / 签约方核验页，SSE 进度 |
 | 模拟面试、简历改写 | ❌ | 按 V3 明确不做 |
 
@@ -74,6 +74,16 @@ npm run dev
 
 可选配置：复制 `backend/.env.example` 为 `backend/.env` 并填写 LLM / 高德 Key。
 全部留空时系统仍可运行，走规则 + 模板降级。
+
+Windows 下如果 OCR 报 `MSVCP140_1.dll` 缺失（onnxruntime 依赖），执行一次：
+
+```bash
+cd backend
+python scripts/setup_ocr_dlls.py
+```
+
+该脚本把 VC++ 运行库提取到 `backend/vendor/msvc`（已加入 `.gitignore`），
+`app/ocr.py` 启动时会自动加入 DLL 搜索目录。
 
 ## 数据
 

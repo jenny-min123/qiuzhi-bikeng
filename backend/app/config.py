@@ -52,8 +52,8 @@ class Settings:
     # 可插拔证据源
     amap_api_key: str = os.getenv("AMAP_API_KEY", "")
 
-    # OCR 入口（F-09）。未接入时 /ocr 明确返回 503，不返回假文本。
-    ocr_engine: str = os.getenv("OCR_ENGINE", "disabled")
+    # OCR 入口（F-09）：auto = 装有 rapidocr 就启用；disabled = 明确关闭
+    ocr_engine: str = os.getenv("OCR_ENGINE", "auto")
 
 
 settings = Settings()
