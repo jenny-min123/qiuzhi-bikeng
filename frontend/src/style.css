@@ -649,6 +649,24 @@ a {
   margin-top: 0;
 }
 
+.snapshot-list {
+  margin-top: 14px;
+}
+
+.snapshot-item-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.snapshot-item-title strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .field {
   display: flex;
   flex-direction: column;

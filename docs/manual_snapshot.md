@@ -43,7 +43,7 @@ python scripts/import_snapshot.py shot.png --source-url https://www.gsxt.gov.cn/
 核准日期被 VIP 遮挡时脚本会提示，可手工填写或直接跳过。
 
 不想用命令行时，也可以打开前端「公司快照」页面（`/snapshot`），
-上传截图后在同一套字段表单里核对保存。
+一次上传多张截图（每张对应一家公司），逐条核对后单条保存或一键保存全部。
 
 ### 手动参数录入
 
